@@ -1,0 +1,7 @@
+{
+  "name": "DreamList - Wishlist & Price Tracker",
+  "description": "A beautiful, minimalist wishlist application for tracking personal goals, shared family purchases, and product price trends with real-time alerts.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
