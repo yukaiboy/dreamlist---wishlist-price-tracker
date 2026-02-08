@@ -21,12 +21,13 @@ const CATEGORIES = [
 
 const DashboardView: React.FC<Props> = ({ onSelectProduct, onNavigate, initialTab = 'personal' }) => {
   const { profile } = useAuth();
-  const { products, loading: productsLoading, stats } = useProducts();
+  const { products, loading: productsLoading, stats, deleteProduct } = useProducts();
   const { groups, loading: groupsLoading } = useGroups();
 
   const [listType, setListType] = useState<'personal' | 'shared'>(initialTab);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [selectedGroupIndex, setSelectedGroupIndex] = useState(0);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
   // 過濾商品
   const filteredProducts = useMemo(() => {
@@ -178,7 +179,15 @@ const DashboardView: React.FC<Props> = ({ onSelectProduct, onNavigate, initialTa
                       </div>
                     </div>
                     <div className="flex items-center">
-                      <span className="material-symbols-outlined text-gray-300">chevron_right</span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setProductToDelete(product.id);
+                        }}
+                        className="size-10 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-[22px]">delete</span>
+                      </button>
                     </div>
                   </div>
                 ))
@@ -302,6 +311,45 @@ const DashboardView: React.FC<Props> = ({ onSelectProduct, onNavigate, initialTa
           </button>
         </div>
       </nav>
+      {/* Delete Confirmation Modal */}
+      {productToDelete && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setProductToDelete(null)}
+          ></div>
+          <div className="relative w-full max-w-sm bg-white dark:bg-[#1c1c1e] rounded-[32px] p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex flex-col items-center text-center">
+              <div className="size-16 rounded-3xl bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-500 mb-6">
+                <span className="material-symbols-outlined text-3xl">delete_forever</span>
+              </div>
+              <h3 className="text-xl font-black text-[#1c140d] dark:text-white mb-2">確認刪除願望？</h3>
+              <p className="text-[#8b7361] dark:text-[#a68d7a] text-sm leading-relaxed mb-8">
+                刪除後將無法復原此項目的所有追蹤資料。
+              </p>
+              <div className="flex w-full gap-3">
+                <button
+                  onClick={() => setProductToDelete(null)}
+                  className="flex-1 py-4 rounded-2xl text-sm font-black text-[#8b7361] dark:text-[#a68d7a] bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={async () => {
+                    if (productToDelete) {
+                      await deleteProduct(productToDelete);
+                      setProductToDelete(null);
+                    }
+                  }}
+                  className="flex-1 py-4 rounded-2xl text-sm font-black bg-red-500 text-white shadow-lg shadow-red-500/20 hover:bg-red-600 transition-colors"
+                >
+                  確認刪除
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

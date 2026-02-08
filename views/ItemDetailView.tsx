@@ -105,9 +105,9 @@ const ItemDetailView: React.FC<Props> = ({ productId, onBack, onSharedList }) =>
 
       <main className="px-4 space-y-8">
         {/* Product Image */}
-        <div className="w-full aspect-square bg-[#f8f5f0] dark:bg-black/20 rounded-[40px] overflow-hidden">
+        <div className="w-full h-72 bg-white dark:bg-black/20 rounded-[40px] overflow-hidden flex items-center justify-center p-6 border border-black/[0.03]">
           {product.image_url ? (
-            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+            <img src={product.image_url} alt={product.name} className="max-w-full max-h-full object-contain drop-shadow-xl" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-[#8b7361]/30">
               <span className="material-symbols-outlined text-[80px]">image</span>
@@ -164,7 +164,7 @@ const ItemDetailView: React.FC<Props> = ({ productId, onBack, onSharedList }) =>
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#8b7361', fontSize: 11 }} width={50} />
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e8e0d6" />
                   <Tooltip
-                    formatter={(value: number) => [`$${value.toLocaleString()}`, '價格']}
+                    formatter={(value: number | undefined) => [value ? `$${value.toLocaleString()}` : '$0', '價格']}
                     contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
                   />
                   <Area type="monotone" dataKey="price" stroke="#f18c27" strokeWidth={3} fill="url(#colorPrice)" />
@@ -183,18 +183,40 @@ const ItemDetailView: React.FC<Props> = ({ productId, onBack, onSharedList }) =>
           <h2 className="text-xl font-black text-[#1c140d] dark:text-white mb-4">平台比價</h2>
           <div className="bg-white dark:bg-card-dark rounded-3xl overflow-hidden shadow-sm border border-black/[0.03] divide-y divide-black/5 dark:divide-white/5">
             {storePrices.map((item, idx) => (
-              <div key={item.store} className="flex items-center justify-between p-5">
-                <div className="flex items-center gap-3">
-                  <div className={`size-10 rounded-full flex items-center justify-center ${idx === 0 ? 'bg-green-100 text-green-600' : 'bg-[#f8f5f0] text-[#8b7361]'}`}>
-                    <span className="material-symbols-outlined text-xl">store</span>
+              <a
+                key={item.store}
+                href="#"
+                onClick={(e) => e.preventDefault()}
+                className="flex items-center justify-between p-5 hover:bg-gray-50 dark:hover:bg-white/5 transition-all group active:scale-[0.99]"
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`size-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${idx === 0 ? 'bg-green-100 text-green-600' : 'bg-[#f8f5f0] dark:bg-white/10 text-[#8b7361]'}`}>
+                    <span className="material-symbols-outlined text-2xl">
+                      {item.store === 'MOMO' ? 'shopping_bag' : item.store === '蝦皮' ? 'shopping_basket' : 'shopping_cart'}
+                    </span>
                   </div>
-                  <span className="font-bold text-[#1c140d] dark:text-white">{item.store}</span>
-                  {idx === 0 && <span className="px-2 py-0.5 bg-green-100 text-green-600 text-[10px] font-black rounded-full">最低價</span>}
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-[#1c140d] dark:text-white">{item.store}</span>
+                      {idx === 0 && (
+                        <span className="px-2 py-0.5 bg-green-500 text-white text-[10px] font-black rounded-full animate-pulse">
+                          最低價
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-[#8b7361] font-bold">由系統自動更新</p>
+                  </div>
                 </div>
-                <span className={`font-black text-lg ${idx === 0 ? 'text-green-600' : 'text-[#1c140d] dark:text-white'}`}>
-                  ${item.price.toLocaleString()}
-                </span>
-              </div>
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <span className={`block font-black text-xl ${idx === 0 ? 'text-green-600' : 'text-[#1c140d] dark:text-white'}`}>
+                      ${item.price.toLocaleString()}
+                    </span>
+                    <span className="text-[10px] text-[#8b7361] font-bold">點擊前往平台</span>
+                  </div>
+                  <span className="material-symbols-outlined text-gray-300 group-hover:text-primary group-hover:translate-x-1 transition-all">chevron_right</span>
+                </div>
+              </a>
             ))}
           </div>
         </section>
